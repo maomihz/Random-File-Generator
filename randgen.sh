@@ -26,6 +26,13 @@ gen() {
 	cd ..
 }
 
+rand() {
+	cat /dev/urandom |
+	od -t u4 |
+	head -n 1 |
+	cut -d '	' -f 2
+}
+
 echo "Program will not exit until you hit Ctrl-C"
 while true
 do
