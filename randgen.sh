@@ -18,8 +18,14 @@ gen() {
 	for i in $(seq 1 100)
 	do
 		echo -n "generating file $i... "
-		FILENAME=$RANDOM
-		head -c $(($RANDOM*2048)) /dev/urandom | base64 >$FILENAME
+		FILENAME=$RANDOM.tmp
+		cat /dev/urandom |
+		od -t x4 |
+		cut -d ' ' -f 2- |
+		tr -d ' ' |
+		tr -d '\n' |
+		fold -w 80 |
+		head -n $(($RANDOM * 32)) > $FILENAME
 		echo $(du -h $FILENAME | cut -d '	' -f 1)
 		mv $FILENAME $(openssl sha1 $FILENAME | cut -d ' ' -f 2)
 	done
@@ -28,10 +34,12 @@ gen() {
 
 rand() {
 	cat /dev/urandom |
-	od -t u4 |
+	od -w4 -t u4 |
 	head -n 1 |
-	cut -d '	' -f 2
+	cut -d ' ' -f 2- |
+	tr -d ' '
 }
+
 
 echo "Program will not exit until you hit Ctrl-C"
 while true
